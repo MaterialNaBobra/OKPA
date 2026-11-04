@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "frontend",
+    "slug": "okpa",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.materialnabobra.okpa"
+    },
+    "android": {
+      "package": "com.materialnabobra.okpa"
+    },
+    "web": {},
+    "scheme": "frontend",
+    "plugins": [
+      "expo-router"
+    ],
+    "sdkVersion": "51.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "936a8d7d-1a02-4dd0-bc9a-534c105135ee"
+      }
+    }
+  }
+}
