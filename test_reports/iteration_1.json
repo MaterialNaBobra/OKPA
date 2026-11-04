@@ -1,0 +1,50 @@
+{
+  "summary": "First full test run. Backend: 20 pytest tests covering auth, admin seed, groups, plans CRUD/validation, weekly expansion with interval_weeks, occurrences sharing/403, group occurrences, free-days, meetings CRUD and RSVP (yes/no adds or removes the meeting in /occurrences), and admin endpoints with cascade. 18/20 pass. The 2 failures are invalid calendar dates that cause 500 errors, and one bad plan breaks occurrences for the whole group. Frontend (375x667 web preview) works end to end for login with wrong-password error, register, create and join a group by code (bad-code error shown), add a weekly plan via the FAB with minute precision, end>start validation, edit a plan, month/week toggle, people tab to user plan, shared tab legend chips and coloured week blocks, free days excluding busy days, proposing a meeting with and without time, RSVP Idę/Nie idę with counts, the meeting appearing in my plan, profile password change, logout, session persistence, and the admin panel (rename, reset password, toggle role, remove member, delete user). CRITICAL: opening an existing meeting in the Spotkania tab (meeting-open-*) crashes the whole app with RangeError 'Invalid time value'. HIGH: the minute TextInputs in TimeField are pushed off-screen on web (each input is 261px wide), so the plan and meeting sheets scroll sideways and users can't see the minutes. No deprecated Expo packages found (no expo-av, expo-barcode-scanner or expo-background-fetch).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/occurrences, /api/groups/{gid}/occurrences, /api/groups/{gid}/free-days", "issue": "DATE_PATTERN only checks the digit format. start=2026-13-01 makes date.fromisoformat raise ValueError, which returns 500 instead of 400. Fix: wrap parse_d in try/except and raise HTTPException(400)."},
+      {"endpoint": "POST/PUT /api/plans, POST/PUT meetings", "issue": "Impossible dates like '2026-02-31' are accepted and stored. After that, GET /api/occurrences returns 500 for that user, and so do group occurrences and free-days for every member of their groups. One bad record breaks the whole group. Fix: validate date, start_date and end_date with date.fromisoformat in validate_plan/validate_meeting (or a Pydantic field_validator)."},
+      {"endpoint": "GET /api/groups/{gid}/free-days", "issue": "Logic gap: the meeting creator is automatically RSVP'd 'yes', so as soon as a meeting is proposed its day counts as busy and disappears from the free-days list. meeting_by_date and the frontend 'free-day-view-meeting-*' button are therefore effectively unreachable. Decide whether the day should stay listed with its meeting, or drop that dead code."},
+      {"endpoint": "POST /api/groups/{gid}/leave, DELETE /api/admin/users/{uid}", "issue": "Groups left with 0 members are never removed (orphans like TEST_g2 showed '0 os.' in the admin panel). If the owner leaves or is deleted, owner_id points to a missing user. Consider deleting empty groups and passing ownership to another member."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Spotkania tab -> MeetingSheet (edit existing meeting)", "issue": "Tapping a meeting card to edit it crashes the whole app: the error boundary shows 'Something went wrong – Invalid time value'. RCA: app/(tabs)/meetings.tsx:168 passes defaultDate={edit?.date ?? \"\"}. MeetingSheet mounts while edit=null, so its date state starts as \"\". When the sheet opens, the first render (before the useEffect sets the meeting's date) renders DateField with value \"\", and fmtLong('') calls date-fns format on an Invalid Date, which throws a RangeError. DateField's anchor useState(fromISO(value)) also captures the invalid/stale date at mount and never re-syncs. This also blocks meeting edit and delete (meeting-delete-button) in the UI. Fix: use defaultDate={edit?.date ?? todayISO()} and/or mount the sheet only when edit != null. In DateField, call setAnchor(fromISO(value)) when the picker opens and guard against invalid values.", "testID": "meeting-open-{id}", "priority": "CRITICAL"},
+      {"component": "TimeField (src/components/Pickers.tsx:183 timeInput)", "issue": "On web each hour/minute TextInput is 261px wide (RN-web gives TextInput an intrinsic width; flex:1 without minWidth:0/width). Measured in the plan sheet: start-hour at x=31, start-minute at x=309, end-hour at x=205, end-minute at x=483 on a 375px screen. The sheet's ScrollView content is 744px wide against 375px visible, so the minutes are hidden and the sheet scrolls sideways. Affects plan-start/plan-end and meeting-start/meeting-end. Fix: add minWidth: 0 and width: '100%' (or a fixed width of about 48) to timeInput.", "testID": "plan-start-minute, plan-end-minute, meeting-start-minute, meeting-end-minute", "priority": "HIGH"},
+      {"component": "Admin screen accessed by non-admin", "issue": "Opening /admin directly as a regular user shows 'Ładowanie...' forever, with counts showing (0). The 403 is never surfaced, and the screen has no redirect and no error state. Data is still protected by the backend.", "testID": "admin-tab", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Global Toast", "issues": ["The toast pill appears top-centre and covers the screen title and back button (e.g. 'Mój plan', 'Profil', 'Twoje grupy') for its whole duration. Offset it below the header or move it to the bottom above the tab bar."]},
+      {"screen": "Spotkania card", "issues": ["The date line is title-cased, giving 'Piątek, 6 Listopada 2026 · Za 2 Dni'. In Polish only the first letter should be capitalised: 'Piątek, 6 listopada 2026 · za 2 dni'."]},
+      {"screen": "Week view (Plan/Wspólny)", "issues": ["The 'cały dzień' label and block titles are about 9-10px and wrap awkwardly in narrow columns (e.g. 'TEST_Pr/aca'). Consider at least 11px and numberOfLines with ellipsis."]},
+      {"screen": "Admin -> Grupy", "issues": ["Remove-member (person-remove icon) runs immediately with no confirmation, while the other destructive actions use a confirm sheet."]}
+    ],
+    "react_native_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/test_scheduler_api.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "CRITICAL: Fix the crash when opening an existing meeting (meetings.tsx:168 defaultDate '' -> fmtLong('') RangeError). Use todayISO() as the fallback or render MeetingSheet only when edit is set. Make DateField re-sync its anchor when value changes or the picker opens.",
+    "HIGH: Fix the TimeField TextInput width on web (Pickers.tsx timeInput: add minWidth:0 / an explicit width) so the minute inputs are visible and the sheets stop scrolling sideways.",
+    "Backend: validate real calendar dates (date.fromisoformat) for plans, meetings and the occurrences/free-days query params. Return 400 instead of storing impossible dates or crashing with 500.",
+    "Decide the free-days behaviour for days with a proposed meeting (they currently disappear because the creator is auto-RSVP'd 'yes').",
+    "Handle 403/error state on the admin screen (redirect non-admins).",
+    "Optional: clean up empty groups or reassign the owner on leave/delete; move the Toast so it doesn't cover headers; fix capitalisation of Polish dates on meeting cards."
+  ],
+  "critical_code_review_comments": [
+    "server.py: DATE_PATTERN regex alone isn't enough to validate dates (see backend minor issues).",
+    "server.py admin_delete_group doesn't check that the group exists (always returns ok) – minor.",
+    "server.py admin_update_user lets any admin demote the seeded admin Borys. seed_admin restores the role on restart, but until then Borys loses admin access.",
+    "Pickers.tsx clamp allows hour 24 with any minutes (e.g. 24:30). The backend rejects this with 422 and the UI shows the generic 'Sprawdź poprawność pól'.",
+    "No deprecated Expo packages; keyboard handling uses react-native-keyboard-controller KeyboardAwareScrollView in the sheets, login and groups screens – good."
+  ],
+  "updated_files": ["/app/backend/tests/test_scheduler_api.py (new)"],
+  "success_rate": {"backend": "90% (18/20)", "frontend": "~90% (all core flows pass; meeting edit crashes; minute inputs hidden)"},
+  "seed_data_creation": "All TEST_ users/groups/plans/meetings created during testing were deleted by id. DB is back to its original state: users=[Borys], groups=[Ekipa]. No seeded data was modified.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Run the backend tests with: cd /app && python -m pytest backend/tests/test_scheduler_api.py -n 0 (pytest.ini enables xdist; the module fixtures need -n 0). The frontend env key is EXPO_PUBLIC_BACKEND_URL, not EXPO_BACKEND_URL. The container clock is 2026-11-04. Sheets are RN Modals with a slide animation: wait about 1.2s after opening before clicking, then use scroll_into_view_if_needed + click(force=True). Tab testIDs are tab-index, tab-people, tab-shared, tab-free and tab-meetings. Segmented option testIDs follow `${testID}-${value}`, e.g. auth-mode-register, plan-kind-weekly, my-calendar-mode-week, admin-tab-groups. The weekly plan form preselects today's weekday, so clicking it toggles it off. Retest: meeting-open-* edit/delete, and the minute inputs' visibility.",
+  "rca_of_issue": "Meeting edit crash: meetings.tsx always renders <MeetingSheet defaultDate={edit?.date ?? ''}>. useState(defaultDate) inside MeetingSheet therefore starts as ''. When edit is set, Modal visible=true and the children render once with date='' before the useEffect runs. DateField calls fmtLong('') -> date-fns format(parseISO('')) -> RangeError: Invalid time value, and the ErrorBoundary takes over the whole app. Reproduce: create a meeting (Wolne -> Zaproponuj spotkanie), go to Spotkania, tap the meeting card body (meeting-open-{id}). Mitigation: give a valid fallback date, conditionally mount the sheet, and guard DateField against invalid values."
+}

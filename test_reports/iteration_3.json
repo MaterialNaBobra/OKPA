@@ -1,0 +1,27 @@
+{
+  "summary": "Iteration 3, frontend only, at a 375x667 viewport. Everything requested passed. OKPA branding: the login app-title reads 'OKPA'; both share texts in groups.tsx:126 and people.tsx:24 say 'w aplikacji OKPA' (checked in code); icon.png and splash-image.png are green with the OKPA calendar; app.json name is OKPA and its backgrounds are #16A34A. No photos: there are no <img> or background-image elements on the login, groups hero (calendar icon), Ludzie empty state (person-add icon), Wolne or Spotkania empty state (cafe icon), and no Image or require() of images in app/ or src/. Shared calendar seed: meeting A had 3 attendees (u1 as creator plus u2 and u3 RSVP yes); meeting B had 0 attendees (its creator answered no). Month view: exactly one shared-calendar-meeting-badge per meeting day, and the day panel shows one occ-row-<mid>-__meeting__ next to the two member plans. Week view: exactly one week-block per meeting (A: 1, B: 1), background rgb(20,83,45) dark green, with a cafe icon. Tapping a block opens shared-meeting-sheet. For A it shows title, 'Czwartek, 5 listopada 2026', '18:00 – 20:00', Rynek, 'Idą (3)' and all 3 names. For B it shows 'Idą (0)', 'Nikt jeszcze się nie zapisał' and 'Nie idą: TEST_u3'. The occurrence-sheet does not open at the same time. shared-meeting-go-button goes to /meetings. Hiding a user with the legend chip hides that user's plan, and the meeting block stays. Personal calendar: the Plan tab for u1 shows A (badge and row) and not B. user/[id] for u2 and u3 shows A and not B (u3 said no). Regression: adding a plan with the FAB saved (09:00-10:00 TEST_fabplan) and it appears in the shared calendar with the user's name. Member plan colors stay per user (u1 yellow rgb(253,224,71), u2 green rgb(134,239,172)) in the month bars and the week blocks. No page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Wspólny week view", "issues": ["Overlapping blocks are only offset by (userOrder % 4) * 4 px (CalendarView.tsx:351). A meeting at the same time as a member's plan will mostly cover it, or be covered by it. This was not exercised; it comes from code review. Low priority.", "Meeting titles wrap mid-word in the narrow 37px columns ('TEST_' / 'kinoB'). Cosmetic."]}
+    ],
+    "react_native_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/ui_seed_it3.py"],
+  "action_items": [
+    "Optional: remove the unused template assets (assets/images/react-logo*.png, partial-react-logo.png, app-image.png). Nothing references them.",
+    "Optional: give overlapping week blocks proper side-by-side lanes so a meeting doesn't hide plans in the same time slot."
+  ],
+  "critical_code_review_comments": [
+    "shared.tsx builds the meeting blocks from /groups/{gid}/meetings, one per meeting, and filters out the per-attendee 'meeting' occurrences. This is correct. The query key ['meetings', gid, 'all'] is invalidated by the MeetingSheet and meetings.tsx RSVP handlers through the ['meetings'] prefix.",
+    "The shared calendar shows meetings whatever the RSVP status. Meetings where everyone answered 'no' still appear. This looks intentional."
+  ],
+  "updated_files": ["/app/backend/tests/ui_seed_it3.py (new UI seed and cleanup helper, TEST_ data only)"],
+  "success_rate": {"backend": "skipped (frontend only)", "frontend": "100% of requested flows"},
+  "seed_data_creation": "Created TEST_u1d845..TEST_u4d845, groups TEST_gd845 and TEST_emptyg, 2 meetings and 3 plans. All of them were deleted by id afterwards. The real data (Borys, group 'OKPA') was untouched.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Run 'python /app/backend/tests/ui_seed_it3.py' to seed (writes /tmp/ui_seed3.json), then 'python ui_seed_it3.py cleanup'. Meeting blocks in the shared calendar have testID week-block-<mid>-__meeting__ and occ-row-<mid>-__meeting__. Wait about 1.5s after opening the plan sheet before tapping plan-save-button, because the sheet animation leaves the button outside the viewport."
+}

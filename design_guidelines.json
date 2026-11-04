@@ -1,0 +1,182 @@
+{
+  "app_name": "OKPA",
+  "personality": "4 Tactile / Playful LIGHT",
+  "personality_one_liner": "A friendly, touchable, and vibrant shared space that makes group coordination feel like a breeze rather than a chore.",
+  "color": {
+    "surface": "#FDFBF7",
+    "onSurface": "#1C1917",
+    "surfaceSecondary": "#F4F0E6",
+    "onSurfaceSecondary": "#292524",
+    "surfaceTertiary": "#E7E2D5",
+    "onSurfaceTertiary": "#292524",
+    "surfaceInverse": "#292524",
+    "onSurfaceInverse": "#FDFBF7",
+    "brand": "#22C55E",
+    "onBrand": "#022C22",
+    "brandPrimary": "#16A34A",
+    "onBrandPrimary": "#FDFBF7",
+    "brandSecondary": "#BBF7D0",
+    "onBrandSecondary": "#14532D",
+    "brandTertiary": "#DCFCE7",
+    "onBrandTertiary": "#166534",
+    "success": "#10B981",
+    "onSuccess": "#FFFFFF",
+    "warning": "#EAB308",
+    "onWarning": "#422006",
+    "error": "#EF4444",
+    "onError": "#FFFFFF",
+    "info": "#64748B",
+    "onInfo": "#FFFFFF",
+    "border": "#D6D3D1",
+    "borderStrong": "#A8A29E",
+    "divider": "#E7E5E4",
+    "muted": "#78716C",
+    "userColors": [
+      "#FDE047", "#86EFAC", "#FCA5A5", "#FDBA74", "#D9F99D"
+    ]
+  },
+  "typography": {
+    "displayFontFamily": "Nunito",
+    "textFontFamily": "Nunito",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Generous padding around chunky cards, controlled asymmetry, and grouped modular layouts instead of flat lists.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": 2,
+  "navigation": "bottom_tabs",
+  "icon_set": "Phosphor",
+  "glassmorphism": {
+    "enabled": true,
+    "do's": [
+      "Use glass on the bottom tab bar when content scrolls behind it.",
+      "Use glass on sticky headers (e.g., month/week toggle headers) over scrolling calendars."
+    ],
+    "dont's": [
+      "Never apply glass to the calendar blocks, buttons, list rows, or standard cards."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "Login & Auth",
+      "purpose": "A playful entry point for signing up, joining a group via invite code, or logging in.",
+      "states": {
+        "loading": "Spinner over a translucent surfaceSecondary.",
+        "empty": "N/A",
+        "error": "Inline form errors with red highlights and shake animation."
+      },
+      "layout": "Bottom-heavy layout with sticky primary CTA. Inputs have pill shapes and sit on a clean surface."
+    },
+    {
+      "name": "Mój plan (My Plan)",
+      "purpose": "Personal calendar to view and add one-time or recurring plans.",
+      "states": {
+        "loading": "Skeleton grid of days.",
+        "empty": "Warm illustration of a notebook with a 'Add your first plan' CTA.",
+        "error": "Card with readable error and retry button."
+      },
+      "layout": "Segmented control at the top (Month/Week). Week view uses a horizontal scroll carousel for dates and vertical for time. Use a bottom sheet for the 'Add Plan' action to keep users in context."
+    },
+    {
+      "name": "Ludzie (Users)",
+      "purpose": "List of group members where clicking one shows their personal plan.",
+      "states": {
+        "loading": "List of skeleton avatars and names.",
+        "empty": "Illustration of friends with a 'Share invite code' CTA.",
+        "error": "Error message with retry."
+      },
+      "layout": "Grid or stacked cards of users with large avatars. Tapping a user opens their calendar via a bottom sheet or a detail page."
+    },
+    {
+      "name": "Wspólny (Shared Calendar)",
+      "purpose": "The ultimate overlaid calendar where everyone's plans are visible in unique colors.",
+      "states": {
+        "loading": "Skeleton of grid with faded colored blocks.",
+        "empty": "Illustration of an empty calendar.",
+        "error": "Error banner over the calendar grid."
+      },
+      "layout": "Sticky glass header for date selection. A dense but smooth FlatList/ScrollView (60fps optimized) grid where users' plans are rendered as rounded, uniquely colored (using userColors) overlapping blocks."
+    },
+    {
+      "name": "Wolne (Free Days)",
+      "purpose": "A curated list of entirely free days calculated by the app.",
+      "states": {
+        "loading": "Skeleton list of cards.",
+        "empty": "Illustration of a busy schedule with 'No free days this month!' text.",
+        "error": "Error message with retry."
+      },
+      "layout": "Vertical list of chunky, celebratory cards for each free day. Each card has a primary CTA 'Propose Meeting' that opens a bottom sheet."
+    },
+    {
+      "name": "Spotkania (Meetings)",
+      "purpose": "A hub for proposed meetings where users can RSVP and discuss details.",
+      "states": {
+        "loading": "Skeleton cards.",
+        "empty": "Empty state illustration of a coffee cup with 'No upcoming meetings.'",
+        "error": "Error message with retry."
+      },
+      "layout": "Feed of meeting cards. Cards include a title, date/time, place, notes, and clear pill-shaped 'Going' / 'Not Going' RSVP buttons. Tapping the card opens a detail sheet."
+    }
+  ],
+  "images": {
+    "empty_state_friends": {
+      "url": "https://images.unsplash.com/photo-1582298538104-fe2e74c27f59?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwzfHxncm91cCUyMGZyaWVuZHMlMjBtZWV0aW5nJTIwY2FsZW5kYXJ8ZW58MHx8fHwxNzkzODE1ODE4fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Group of friends laughing and high-fiving"
+    },
+    "empty_state_planner": {
+      "url": "https://images.unsplash.com/photo-1435527173128-983b87201f4d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwyfHxncm91cCUyMGZyaWVuZHMlMjBtZWV0aW5nJTIwY2FsZW5kYXJ8ZW58MHx8fHwxNzkzODE1ODE4fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Open monthly planner on a wooden desk"
+    }
+  },
+  "haptics": {
+    "events": {
+      "tab_press": "light",
+      "add_plan_submit": "success",
+      "segmented_control_switch": "selection",
+      "rsvp_going": "success",
+      "rsvp_not_going": "rigid",
+      "date_picker_scroll": "selection"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Strictly follow the 'Tactile / Playful' layout: use chunky cards, generous padding, pill-shaped buttons, and rounded corners to make the app approachable.",
+    "Use @gorhom/bottom-sheet for core actions like 'Add Plan', 'View Member Calendar', and 'Propose Meeting'. This keeps the user within the main context.",
+    "For the Shared Calendar (Wspólny), ensure performance is 60fps by utilizing FlatList/virtualization. Render individual user plans as distinct, colorful, rounded blocks using the custom non-blue 'userColors' array provided.",
+    "Implement a sticky segmented control for toggling between Month and Week views on the calendar screens.",
+    "Keep touch targets at least 44x44pt.",
+    "Whenever displaying imagery with text overlaid, ALWAYS apply a top-to-bottom dark gradient scrim to guarantee text contrast.",
+    "All blue, purple, magenta, orange, and terracotta hues are strictly banned as primary or accent colors. Stick to the provided botanical and earthy yellows/greens.",
+    "Implement the sticky primary CTA over scrolling content pattern (with bottom safe-area clearance) on forms like 'Add Plan' or 'Create Meeting'."
+  ]
+}
