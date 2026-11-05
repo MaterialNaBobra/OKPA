@@ -3,7 +3,6 @@
     "version": ">= 27.4.1",
     "appVersionSource": "remote"
   },
-  "projectRoot": "frontend",
   "build": {
     "development": {
       "developmentClient": true,
