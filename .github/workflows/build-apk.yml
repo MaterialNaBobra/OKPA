@@ -19,6 +19,10 @@ jobs:
       - name: Zainstaluj EAS CLI
         run: npm install -g eas-cli
 
+      - name: Zainstaluj zależności projektu
+        working-directory: ./frontend
+        run: npm install
+
       - name: Uruchom budowanie APK
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
