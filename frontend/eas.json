@@ -1,22 +1,23 @@
 {
   "cli": {
-    "version": ">= 5.0.0"
+    "version": ">= 27.4.1",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "projectRoot": "frontend"
     },
     "preview": {
       "distribution": "internal",
-      "env": {
-        "EXPO_USE_YARN": "0"
+      "projectRoot": "frontend",
+      "android": {
+        "buildType": "apk"
       }
     },
     "production": {
-      "env": {
-        "EXPO_USE_YARN": "0"
-      }
+      "projectRoot": "frontend"
     }
   },
   "submit": {
