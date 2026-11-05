@@ -3,22 +3,19 @@
     "version": ">= 27.4.1",
     "appVersionSource": "remote"
   },
+  "projectRoot": "frontend",
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "projectRoot": "frontend"
+      "distribution": "internal"
     },
     "preview": {
       "distribution": "internal",
-      "projectRoot": "frontend",
       "android": {
         "buildType": "apk"
       }
     },
-    "production": {
-      "projectRoot": "frontend"
-    }
+    "production": {}
   },
   "submit": {
     "production": {}
