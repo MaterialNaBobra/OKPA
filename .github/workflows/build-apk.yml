@@ -2,29 +2,37 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - master
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Pobierz kod z GitHuba
+      - name: Pobierz kod z GitHub
         uses: actions/checkout@v4
 
       - name: Zainstaluj Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'yarn'
+          cache-dependency-path: Wszystko/frontend/yarn.lock
 
       - name: Zainstaluj EAS CLI
-        run: npm install -g eas-cli
+        run: npm install -g eas-cli@latest
 
       - name: Zainstaluj zależności projektu
-        working-directory: ./frontend
-        run: npm install
+        run: |
+          cd Wszystko/frontend
+          yarn install --frozen-lockfile
 
       - name: Uruchom budowanie APK
+        run: |
+          cd Wszystko/frontend
+          eas build --platform android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        working-directory: ./frontend
-        run: eas build --platform android --profile preview --non-interactive
