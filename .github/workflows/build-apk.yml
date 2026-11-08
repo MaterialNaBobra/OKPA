@@ -19,8 +19,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'yarn'
-          cache-dependency-path: Wszystko/frontend/yarn.lock
 
       - name: Zainstaluj EAS CLI
         run: npm install -g eas-cli@latest
